@@ -9,10 +9,13 @@ import android.graphics.Color;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 
+import java.security.SecureRandom;
+import java.util.Random;
+
 //todo 1
 public class NotificationHelper {
 
-    private Context mContext;
+    private final Context mContext;
     private NotificationManager mNotificationManager;
     private NotificationCompat.Builder mBuilder;
     public static final String NOTIFICATION_CHANNEL_ID = "10001";
@@ -21,13 +24,8 @@ public class NotificationHelper {
         mContext = context;
     }
 
-    /**
-     * Create and push the notification
-     */
-    public void createNotification(String title, String message)
-    {
-        /**Creates an explicit intent for an Activity in your app**/
-        Intent resultIntent = new Intent(mContext , SecondActivity.class);
+    public void createNotification(String title, String message) {
+        Intent resultIntent = new Intent(mContext, MainActivity.class);
         resultIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         PendingIntent resultPendingIntent = PendingIntent.getActivity(mContext,
@@ -44,8 +42,7 @@ public class NotificationHelper {
 
         mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-        {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "NOTIFICATION_CHANNEL_NAME", importance);
             notificationChannel.enableLights(true);
@@ -57,6 +54,17 @@ public class NotificationHelper {
             mNotificationManager.createNotificationChannel(notificationChannel);
         }
         assert mNotificationManager != null;
-        mNotificationManager.notify(0 /* Request Code */, mBuilder.build());
+        mNotificationManager.notify(createRandomCode(7), mBuilder.build());
+    }
+
+    public int createRandomCode(int codeLength) {
+        char[] chars = "1234567890".toCharArray();
+        StringBuilder sb = new StringBuilder();
+        Random random = new SecureRandom();
+        for (int i = 0; i < codeLength; i++) {
+            char c = chars[random.nextInt(chars.length)];
+            sb.append(c);
+        }
+        return Integer.parseInt(sb.toString());
     }
 }
